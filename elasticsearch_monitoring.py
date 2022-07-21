@@ -7,13 +7,11 @@ import time
 
 
 # URL Modules
-import urllib
-import urllib.request as urlconnection
 from urllib.error import URLError, HTTPError
 from http.client import InvalidURL
 import requests
 from requests.auth import HTTPBasicAuth 
-import traceback
+
 
 
 
@@ -41,7 +39,6 @@ PASSWORD = None
 NODE = 'suraj-pt5378' # Name of the node
 os.environ['NO_PROXY'] = 'localhost'
 CAFILE= '/opt/cert/certs/ca/ca.crt' # Add the crt file which was used in your elasticsearch
-TIMEOUT=10
 
 
 
@@ -643,6 +640,7 @@ if __name__ == "__main__":
     node_name=args.node_name    
     username=args.username
     password=args.password 
+    sslpath=args.sslpath
     ssl=args.ssl
 
     esk=ElasticSearch(username,password,host_name,port,node_name,ssl)
@@ -650,8 +648,6 @@ if __name__ == "__main__":
     result["heartbeat required"]=HEARTBEAT
     result["plugin version"]=PLUGIN_VERSION
     result['units']=METRICS_UNITS
-
-
     
     print(json.dumps(result,indent=4))
 

@@ -18,7 +18,7 @@ PLUGIN_VERSION = "1"
 HEARTBEAT =True
 METRICS_UNITS = { 'JVM garbage collector old generation time':'ms',
                   'Average JVM memory usage in garbage collector(%)' : '%',
-                  'cpu used (%)':'%',
+                  'CPU used (%)':'%',
                   'OS memory used(%)':'%', 
                   'OS memory free(%)':'%',
                   'JVM heap memory used (%)':'%',

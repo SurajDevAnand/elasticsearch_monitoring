@@ -14,19 +14,17 @@ from requests.auth import HTTPBasicAuth
 
 
 
-
-
-
 PLUGIN_VERSION = "1"
 HEARTBEAT =True
 METRICS_UNITS = { 'JVM garbage collector old generation time':'ms',
                   'Average JVM memory usage in garbage collector(%)' : '%',
-                  'Percentage of cpu used':'%',
+                  'cpu used (%)':'%',
                   'OS memory used(%)':'%', 
                   'OS memory free(%)':'%',
-                  'Number of jvm heap memory used (%)':'%',
-                  'Total time spent on fetches':'ms',
-                  "Total time spent on queries":'ms'
+                  'JVM heap memory used (%)':'%',
+                  'Time spent on fetches':'ms',
+                  "Time spent on queries":'ms',
+                  "Total time on GET requests where the document was missing":'ms'
 
                 }
 
@@ -62,18 +60,18 @@ standard_metrics=[
 
 standard_metrics2={
 
-    "Number of queries hit count":("indices","query_cache","hit_count"),
+    "Queries hit count":("indices","query_cache","hit_count"),
     "Query cache memory size":("indices","query_cache","memory_size_in_bytes"),
     "Query cache miss count":("indices","query_cache","miss_count"),
-    "Number of request cache hit count":("indices","request_cache","hit_count"),
-    "Total number of evictions":("indices","request_cache","evictions"),
-    "Total request cache memory size":("indices","request_cache","memory_size_in_bytes")
+    "Request cache hit count":("indices","request_cache","hit_count"),
+    "Number of evictions":("indices","request_cache","evictions"),
+    "Request cache memory size":("indices","request_cache","memory_size_in_bytes")
 
 }
 
 
 os_metrics={
-    "Percentage of cpu used":("os","cpu","percent"),
+    "CPU used (%)":("os","cpu","percent"),
     "OS memory free(%)":("os","mem","free_percent"),
     "OS memory used(%)":("os","mem","used_percent")
 }
@@ -81,43 +79,43 @@ os_metrics={
 
 search_performance_metrics={
 
-    "Total number of queries":("indices","search","query_total"),
-    "Total time spent on queries":("indices","search","query_time_in_millis"),
-    "Number of queries currently in progress":("indices","search","query_current"),
-    "Total number of fetches":("indices","search","fetch_total"),
-    "Total time spent on fetches":("indices","search","fetch_time_in_millis"),
-    "Number of fetches currently in progress":("indices","search","fetch_current"),
+    "Total queries":("indices","search","query_total"),
+    "Time spent on queries":("indices","search","query_time_in_millis"),
+    "Queries in progress":("indices","search","query_current"),
+    "Number of fetches":("indices","search","fetch_total"),
+    "Time spent on fetches":("indices","search","fetch_time_in_millis"),
+    "Fetches in progress":("indices","search","fetch_current"),
 
 }
 
 
 index_performance_metrics={
 
-    "Total number of documents indexed":('indices','indexing','index_total'),
-    "Total time spent indexing documents":('indices','indexing','index_time_in_millis'),
-    "Number of documents currently being indexed":("indices","indexing","index_current"),
-    "Total number of index refreshes":("indices","refresh","total"),
-    "Total time spent refreshing indices":("indices","refresh","total_time_in_millis"),
-    "Total number of index flushes to disk":("indices","flush","total"),
-    "Total time spent on flushing indices to disk":("indices","flush","total_time_in_millis"),
-    "Number of indices docs count":("indices","docs","count"),
-    "Number of indices docs deleted":("indices","docs","deleted"),
+    "Documents indexed":('indices','indexing','index_total'),
+    "Time of indexing documents":('indices','indexing','index_time_in_millis'),
+    "Documents currently indexed":("indices","indexing","index_current"),
+    "Index refreshes":("indices","refresh","total"),
+    "Time spent on refreshing indices":("indices","refresh","total_time_in_millis"),
+    "Index flushes to disk":("indices","flush","total"),
+    "Time spent on flushing indices to disk":("indices","flush","total_time_in_millis"),
+    "Indices docs count":("indices","docs","count"),
+    "Indices docs deleted":("indices","docs","deleted"),
 
 }
 
 http_connection_metrics={
 
-    "Number of HTTP connections currently open":("http","current_open"),
-    "Total number of HTTP connections opened over time":("http","total_opened")
+    "HTTP connections currently open":("http","current_open"),
+    "HTTP connections opened over time":("http","total_opened")
 }
 
 cluster_health_node_availability_metrics={
     "Cluster Name":("cluster_name"),
     "Cluster status":("status"),
-    "Number of nodes":("number_of_nodes"),
+    "Number of Nodes":("number_of_nodes"),
     "Number of data nodes":("number_of_data_nodes"),
-    "Number of initializing shards":("initializing_shards"),
-    "Number of unassigned shards":("unassigned_shards"),
+    "Initializing shards":("initializing_shards"),
+    "Unassigned shards":("unassigned_shards"),
     "Active primary shards":("active_primary_shards"),
     "Relocating shards":("relocating_shards"),
     "Delayed unassigned shards":('delayed_unassigned_shards')
@@ -126,8 +124,8 @@ cluster_health_node_availability_metrics={
 
 
 unsuccessful_get_metrics={
-    "Total number of GET requests where the document was missing":("indices","get","missing_total"),
-    "Total time spent on GET requests where the document was missing":("indices","get","missing_time_in_millis")
+    "Number of GET requests where the document was missing":("indices","get","missing_total"),
+    "Total time on GET requests where the document was missing":("indices","get","missing_time_in_millis")
 }
 
 network_metrics={
@@ -136,9 +134,9 @@ network_metrics={
 }
 
 jvm_metrics={
-    "Number of jvm heap memory used":("jvm","mem","heap_used_in_bytes"),
-    "Number of jvm heap memory used (%)":("jvm","mem","heap_used_percent"),
-    "Number of jvm heap memory committed":("jvm","mem","heap_committed_in_bytes")
+    "JVM heap memory used":("jvm","mem","heap_used_in_bytes"),
+    "JVM heap memory used (%)":("jvm","mem","heap_used_percent"),
+    "JVM heap memory committed":("jvm","mem","heap_committed_in_bytes")
 }
 
 

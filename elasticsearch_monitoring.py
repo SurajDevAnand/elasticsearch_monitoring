@@ -24,7 +24,8 @@ METRICS_UNITS = { 'JVM garbage collector old generation time':'ms',
                   'JVM heap memory used (%)':'%',
                   'Time spent on fetches':'ms',
                   "Time spent on queries":'ms',
-                  "Total time on GET requests where the document was missing":'ms'
+                  "Total time on GET requests where the document was missing":'ms',
+                  "JVM heap memory committed":'KB'
 
                 }
 
@@ -34,7 +35,7 @@ HOST='localhost'
 PORT='9200'
 USERNAME = None
 PASSWORD = None
-NODE = 'suraj-pt5378' # Name of the node
+NODE = None # Name of the node
 os.environ['NO_PROXY'] = 'localhost'
 CAFILE= '/opt/cert/certs/ca/ca.crt' # Add the crt file which was used in your elasticsearch
 
@@ -64,7 +65,7 @@ standard_metrics2={
     "Query cache memory size":("indices","query_cache","memory_size_in_bytes"),
     "Query cache miss count":("indices","query_cache","miss_count"),
     "Request cache hit count":("indices","request_cache","hit_count"),
-    "Number of evictions":("indices","request_cache","evictions"),
+    "Number of evictions":("indices","request_cache","evictions"), #Done
     "Request cache memory size":("indices","request_cache","memory_size_in_bytes")
 
 }
@@ -134,7 +135,7 @@ network_metrics={
 }
 
 jvm_metrics={
-    "JVM heap memory used":("jvm","mem","heap_used_in_bytes"),
+
     "JVM heap memory used (%)":("jvm","mem","heap_used_percent"),
     "JVM heap memory committed":("jvm","mem","heap_committed_in_bytes")
 }
@@ -643,8 +644,8 @@ if __name__ == "__main__":
 
     esk=ElasticSearch(username,password,host_name,port,node_name,ssl)
     result=esk.MetricCollector()
-    result["heartbeat required"]=HEARTBEAT
-    result["plugin version"]=PLUGIN_VERSION
+    result["heartbeat_required"]=HEARTBEAT
+    result["plugin_version"]=PLUGIN_VERSION
     result['units']=METRICS_UNITS
     
     print(json.dumps(result,indent=4))

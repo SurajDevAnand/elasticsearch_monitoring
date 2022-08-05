@@ -613,7 +613,7 @@ class ElasticSearch():
         self.OsMetrics()
         self.JvmMetrics()
         self.HttpConnectionMetrics()
-        
+
         return self.Maindata
 
 
@@ -651,4 +651,5 @@ if __name__ == "__main__":
     print(json.dumps(result,indent=4))
 
         
+
 

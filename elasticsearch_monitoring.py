@@ -145,7 +145,7 @@ jvm_metrics={
 class ElasticSearch():
 
 
-    def __init__(self,username,password,host,port,nodename,ssl):
+    def __init__(self,username,password,host,port,nodename,ssl,logs_enabled,log_type_name,log_file_path):
 
         # Credentials to login
         self.Maindata={}
@@ -158,6 +158,18 @@ class ElasticSearch():
         self.loadCounterValues()
         self._url= "http://"+self.host+":"+self.port
         self.ssl=ssl
+        self.logsenabled=logs_enabled
+        self.logtypename=log_type_name
+        self.logfilepath=log_file_path
+        applog={}
+        
+        if(self.logsenabled in ['True', 'true', '1']):
+        	applog["logs_enabled"]=True
+        	applog["log_type_name"]=self.logtypename
+        	applog["log_file_path"]=self.logfilepath
+        else:
+        	applog["logs_enabled"]=False
+        self.Maindata['applog'] = applog
 
 
 
@@ -631,6 +643,9 @@ if __name__ == "__main__":
     parser.add_argument('--password', help='password of the elasticsearch', nargs='?', default=PASSWORD)
     parser.add_argument('--sslpath', help='elasticsearch ssl path', nargs='?', default=CAFILE)
     parser.add_argument('--ssl', help='ssl option', nargs='?', default="NO")
+    parser.add_argument('--logs_enabled', help='enable log collection for this plugin application',default="False")
+    parser.add_argument('--log_type_name', help='Display name of the log type', nargs='?', default=None)
+    parser.add_argument('--log_file_path', help='list of comma separated log file paths', nargs='?', default=None)
 
 
     args = parser.parse_args()
@@ -641,8 +656,12 @@ if __name__ == "__main__":
     password=args.password 
     sslpath=args.sslpath
     ssl=args.ssl
+    logs_enabled = args.logs_enabled
+    log_type_name = args.log_type_name
+    log_file_path = args.log_file_path
+    
 
-    esk=ElasticSearch(username,password,host_name,port,node_name,ssl)
+    esk=ElasticSearch(username,password,host_name,port,node_name,ssl,logs_enabled,log_type_name,log_file_path)
     result=esk.MetricCollector()
     result["heartbeat_required"]=HEARTBEAT
     result["plugin_version"]=PLUGIN_VERSION

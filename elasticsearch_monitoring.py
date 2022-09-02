@@ -39,9 +39,6 @@ NODE = None # Name of the node
 os.environ['NO_PROXY'] = 'localhost'
 CAFILE= '/opt/cert/certs/ca/ca.crt' # Add the crt file which was used in your elasticsearch
 
-
-
-
 counterFilePath = '/opt/site24x7/monagent/plugins/elasticsearch_monitoring/counter.json'
 
 
@@ -129,10 +126,7 @@ unsuccessful_get_metrics={
     "Total time on GET requests where the document was missing":("indices","get","missing_time_in_millis")
 }
 
-network_metrics={
-    "Host":("host"),
-    "Transport Address":("transport_address")
-}
+
 
 jvm_metrics={
 
@@ -161,14 +155,16 @@ class ElasticSearch():
         self.logsenabled=logs_enabled
         self.logtypename=log_type_name
         self.logfilepath=log_file_path
+
         applog={}
         
         if(self.logsenabled in ['True', 'true', '1']):
-        	applog["logs_enabled"]=True
-        	applog["log_type_name"]=self.logtypename
-        	applog["log_file_path"]=self.logfilepath
+            applog["logs_enabled"]=True
+            applog["log_type_name"]=self.logtypename
+            applog["log_file_path"]=self.logfilepath
         else:
-        	applog["logs_enabled"]=False
+            applog["logs_enabled"]=False
+            
         self.Maindata['applog'] = applog
 
 
@@ -335,9 +331,24 @@ class ElasticSearch():
             self.Maindata['Average JVM memory usage in garbage collector(%)'] = float(sum(mem_used_perc_list)/len(mem_used_perc_list))
         except Exception as e:
             pass
+    
+    def MetricCollector(self):
+        self.StandardMetrics()
+        self.parseMetrics(standard_metrics2)
+        self.parseMetrics(os_metrics)
+        self.parseMetrics(search_performance_metrics)
+        self.parseMetrics(index_performance_metrics)
+        self.parseMetrics(http_connection_metrics)
+        self.parseMetrics(unsuccessful_get_metrics)
+        self.parseMetrics(jvm_metrics)
+        self.ClusterHealthMetrics()
 
 
-    def OsMetrics(self):
+
+
+        return self.Maindata
+        
+    def parseMetrics(self,datapath):
 
         try:
             suffix='/_nodes/stats'
@@ -356,9 +367,9 @@ class ElasticSearch():
                     self.Maindata["Node Availability"]="Available"
                     nodedata =searchdata['nodes'][node]
 
-                    for key1 in os_metrics:
+                    for key1 in datapath:
                         resultback=nodedata
-                        for key2 in os_metrics[key1]:
+                        for key2 in datapath[key1]:
                             resultback=resultback[key2]
                         self.Maindata[key1]=resultback
 
@@ -370,232 +381,7 @@ class ElasticSearch():
 
 
         except Exception as e:
-                self.Maindata['msg']=str(e)
-
-
-
-
-
-
-    def JvmMetrics(self):
-
-        try:
-            suffix='/_nodes/stats'
-            searchdata=self._openURL2(suffix)
-            searchdata=json.loads(searchdata)
-            nodes=searchdata['nodes'].keys()
-            nodedata=searchdata['nodes']
-            is_node_present=False
-            resultback={}
-
-            for node in nodes:
-
-                if searchdata['nodes'][node]['name']==self.nodename:
-                    is_node_present=True
-                    self.Maindata['Status of the node']=1
-                    self.Maindata["Node Availability"]="Available"
-                    nodedata =searchdata['nodes'][node]
-
-                    for key1 in jvm_metrics:
-                        resultback=nodedata
-                        for key2 in jvm_metrics[key1]:
-                            resultback=resultback[key2]
-                        self.Maindata[key1]=resultback
-
-                
-            if not is_node_present:
-                self.Maindata['Status of the node']=0
-                self.Maindata["Node Availability"]="The given node was not found in the cluster"
-
-        except Exception as e:
-            self.Maindata['msg']=str(e)
-
-
-
-
-
-    def SearchPerformanceMetrics(self):
-
-        try:
-            suffix='/_nodes/stats'
-            searchdata=self._openURL2(suffix)
-            searchdata=json.loads(searchdata)
-            nodes=searchdata['nodes'].keys()
-            nodedata=searchdata['nodes']
-            is_node_present=False
-            resultback={}
-
-            for node in nodes:
-
-                if searchdata['nodes'][node]['name']==self.nodename:
-                    is_node_present=True
-                    self.Maindata['Status of the node']=1
-                    self.Maindata["Node Availability"]="Available"
-                    nodedata =searchdata['nodes'][node]
-
-                    for key1 in search_performance_metrics:
-                        resultback=nodedata
-                        for key2 in search_performance_metrics[key1]:
-                            resultback=resultback[key2]
-                        self.Maindata[key1]=resultback
-
-                
-            if not is_node_present:
-                self.Maindata['Status of the node']=0
-                self.Maindata["Node Availability"]="The given node was not found in the cluster"
-
-        except Exception as e:
-                self.Maindata['msg']=str(e)
-
-
-
-
-
-    def StandardMetrics2(self):
-
-        try:
-            suffix='/_nodes/stats'
-            searchdata=self._openURL2(suffix)
-            searchdata=json.loads(searchdata)
-            nodes=searchdata['nodes'].keys()
-            nodedata=searchdata['nodes']
-            is_node_present=False
-            resultback={}
-
-            for node in nodes:
-
-                if searchdata['nodes'][node]['name']==self.nodename:
-                    is_node_present=True
-                    self.Maindata['Status of the node']=1
-                    self.Maindata["Node Availability"]="Available"                    
-                    nodedata =searchdata['nodes'][node]
-
-                    for key1 in standard_metrics2:
-                        resultback=nodedata
-                        for key2 in standard_metrics2[key1]:
-                            resultback=resultback[key2]
-                        self.Maindata[key1]=resultback
-
-                
-            if not is_node_present:
-                self.Maindata['Status of the node']=0
-                self.Maindata["Node Availability"]="The given node was not found in the cluster"
-
-        except Exception as e:
-                self.Maindata['msg']=str(e)
-
-
-
-
-
-    def UnsucessfulGetMetrics(self):
-
-        try:
-            suffix='/_nodes/stats'
-            searchdata=self._openURL2(suffix)
-            searchdata=json.loads(searchdata)
-            nodes=searchdata['nodes'].keys()
-            nodedata=searchdata['nodes']
-            is_node_present=False
-            resultback={}
-
-            for node in nodes:
-
-                if searchdata['nodes'][node]['name']==self.nodename:
-                    is_node_present=True
-                    self.Maindata['Status of the node']=1
-                    self.Maindata["Node Availability"]="Available"
-                    nodedata =searchdata['nodes'][node]
-
-                    for key1 in unsuccessful_get_metrics:
-                        resultback=nodedata
-                        for key2 in unsuccessful_get_metrics[key1]:
-                            resultback=resultback[key2]
-                        self.Maindata[key1]=resultback
-
-                
-            if not is_node_present:
-                self.Maindata['Status of the node']=0
-                self.Maindata["Node Availability"]="The given node was not found in the cluster"
-
-
-        except Exception as e:
-                self.Maindata['msg']=str(e)
-
-        
-    def IndexPerformanceMetrics(self):
-
-        try:
-            suffix='/_nodes/stats'
-            searchdata=self._openURL2(suffix)
-            searchdata=json.loads(searchdata)
-            nodes=searchdata['nodes'].keys()
-            nodedata=searchdata['nodes']
-            is_node_present=False
-            resultback={}
-
-            for node in nodes:
-
-                if searchdata['nodes'][node]['name']==self.nodename:
-                    is_node_present=True
-                    self.Maindata['Status of the node']=1
-                    self.Maindata["Node Availability"]="Available"
-                    nodedata =searchdata['nodes'][node]
-
-                    for key1 in index_performance_metrics:
-                        resultback=nodedata
-                        for key2 in index_performance_metrics[key1]:
-                            resultback=resultback[key2]
-                        self.Maindata[key1]=resultback
-
-                
-            if not is_node_present:
-                self.Maindata['Status of the node']=0
-                self.Maindata["Node Availability"]="The given node was not found in the cluster"
-
-
-        except Exception as e:
-                self.Maindata['msg']=str(e)
-
-
-
-      
-
-    def HttpConnectionMetrics(self):
-
-        try:
-            suffix='/_nodes/stats'
-            searchdata=self._openURL2(suffix)
-            searchdata=json.loads(searchdata)
-            nodes=searchdata['nodes'].keys()
-            nodedata=searchdata['nodes']
-            is_node_present=False
-            resultback={}
-
-            for node in nodes:
-
-                if searchdata['nodes'][node]['name']==self.nodename:
-                    is_node_present=True
-                    self.Maindata['Status of the node']=1
-                    self.Maindata["Node Availability"]="Available"
-                    nodedata =searchdata['nodes'][node]
-
-                    for key1 in http_connection_metrics:
-                        resultback=nodedata
-                        for key2 in http_connection_metrics[key1]:
-                            resultback=resultback[key2]
-                        self.Maindata[key1]=resultback
-
-                
-            if not is_node_present:
-                self.Maindata['Status of the node']=0
-                self.Maindata["Node Availability"]="The given node was not found in the cluster"
-
-
-        except Exception as e:
-                self.Maindata['msg']=str(e)
-
-
+                self.Maindata['msg']=str(e)        
 
 
 
@@ -611,25 +397,6 @@ class ElasticSearch():
 
         except Exception as e:
             self.Maindata['msg']=str(e)
-
-        
-
-    def MetricCollector(self):
-
-        self.StandardMetrics()
-        self.StandardMetrics2()
-        self.SearchPerformanceMetrics()
-        self.ClusterHealthMetrics()
-        self.IndexPerformanceMetrics()
-        self.UnsucessfulGetMetrics()
-        self.OsMetrics()
-        self.JvmMetrics()
-        self.HttpConnectionMetrics()
-
-        return self.Maindata
-
-
-
 
 
 if __name__ == "__main__":
@@ -666,7 +433,6 @@ if __name__ == "__main__":
     result["heartbeat_required"]=HEARTBEAT
     result["plugin_version"]=PLUGIN_VERSION
     result['units']=METRICS_UNITS
-    
     print(json.dumps(result,indent=4))
 
         

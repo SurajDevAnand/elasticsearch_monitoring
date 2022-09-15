@@ -373,8 +373,11 @@ class ElasticSearch():
                             resultback=resultback[key2]
                         self.Maindata[key1]=resultback
 
-                
+
             if not is_node_present:
+                for key1 in datapath:
+                        self.Maindata[key1]=0
+
                 self.Maindata['Status of the node']=0
                 self.Maindata["Node Availability"]="The given node was not found in the cluster"
                 pass
